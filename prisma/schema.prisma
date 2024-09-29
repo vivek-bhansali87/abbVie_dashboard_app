@@ -1,0 +1,113 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id             String          @id @default(uuid())
+  username       String          @unique
+  email          String          @unique
+  role           String          // Replaced enum with String
+  departmentId   String
+  department     Department      @relation(fields: [departmentId], references: [id])
+  accessRequests AccessRequest[]
+  favorites      Favorite[]
+  layouts        Layout[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+}
+
+model KPI {
+  id                    String            @id @default(uuid())
+  name                  String
+  description           String
+  accessLevel           String            // Replaced enum with String
+  authorizedRoles       String            // Store as JSON string
+  authorizedDepartments String            // Store as JSON string
+  metricIds             String            // Store as JSON string
+  visualizations        String            // Store as JSON string
+  businessQuestions     String            // Store as JSON string
+  calculations          String
+  affiliateApplicability String           // Store as JSON string
+  highlights            LibraryHighlight[]
+  favorites             Favorite[]
+  accessRequests        AccessRequest[]
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+}
+
+model Department {
+  id                 String       @id @default(uuid())
+  name               String
+  parentDepartmentId String?
+  parentDepartment   Department?  @relation("DepartmentHierarchy", fields: [parentDepartmentId], references: [id])
+  childDepartments   Department[] @relation("DepartmentHierarchy")
+  users              User[]
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+}
+
+model AccessPolicy {
+  id        String   @id @default(uuid())
+  name      String
+  rules     String   // Store as JSON string
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AccessRequest {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  kpiId       String
+  kpi         KPI      @relation(fields: [kpiId], references: [id])
+  requestedAt DateTime @default(now())
+  reason      String
+  status      String   // Replaced enum with String
+  reviewedBy  String?
+  reviewedAt  DateTime?
+  expiresAt   DateTime
+  lastModified DateTime @updatedAt
+}
+
+model LibraryHighlight {
+  id        String   @id @default(uuid())
+  kpiId     String
+  kpi       KPI      @relation(fields: [kpiId], references: [id])
+  type      String   // Replaced enum with String
+  order     Int
+  startDate DateTime
+  endDate   DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([kpiId, type])
+}
+
+model Favorite {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  kpiId     String
+  kpi       KPI      @relation(fields: [kpiId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([userId, kpiId])
+}
+
+model Layout {
+  id        String   @id @default(uuid())
+  name      String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  content   String   // Store as JSON string
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
