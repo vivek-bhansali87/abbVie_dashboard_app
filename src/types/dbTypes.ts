@@ -11,8 +11,8 @@ export interface KPI {
   businessQuestions: string;
   calculations: string;
   affiliateApplicability: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: string | Date;
+  updatedAt: string | Date;
 }
 
 export interface Layout {
@@ -22,4 +22,16 @@ export interface Layout {
   kpiIds: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface LibraryHighlight {
+  id: string;
+  kpiId: string;
+  type: string;
+  order: number;
+  startDate: string | Date;
+  endDate: string | Date;
+  createdAt: string | Date;
+  updatedAt: string | Date;
+  kpi: KPI;
 }

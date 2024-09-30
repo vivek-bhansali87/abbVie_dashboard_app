@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import * as dbTypes from "../../../types/dbTypes";
-import * as types from "../../../types";
+import * as dbTypes from "../../types/dbTypes";
+import * as types from "../../types";
 
 function parseUserRole(role: string): types.UserRole {
   if (Object.values(types.UserRole).includes(role as types.UserRole)) {
@@ -41,6 +41,8 @@ async function fetchKPIs(
       visualizations: JSON.parse(kpi.visualizations),
       businessQuestions: JSON.parse(kpi.businessQuestions),
       affiliateApplicability: JSON.parse(kpi.affiliateApplicability),
+      createdAt: new Date(kpi.createdAt),
+      updatedAt: new Date(kpi.updatedAt),
     })
   );
 }

@@ -23,8 +23,8 @@ export interface Favorite {
   id: string;
   userId: string;
   kpiId: string;
-  user?: User; // Optional because we might not always need the full User data
-  kpi?: KPI; // Optional because we might not always need the full KPI data
+  user?: User;
+  kpi?: KPI;
   createdAt: Date;
 }
 
@@ -35,8 +35,8 @@ export interface User {
   email: string;
   role: UserRole;
   department: string;
-  adhocAccess: string[]; // Array of AccessRequest IDs
-  favorites?: Favorite[]; // New field
+  adhocAccess: string[];
+  favorites?: Favorite[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -49,7 +49,7 @@ export interface KPI {
   accessLevel: KPIAccessLevel;
   authorizedRoles: UserRole[];
   authorizedDepartments: string[];
-  metricIds: string[]; // IDs of metrics used in this KPI
+  metricIds: string[];
   visualizations: {
     type: string;
     config: object;
@@ -57,13 +57,15 @@ export interface KPI {
   businessQuestions: string[];
   calculations: string;
   affiliateApplicability: string[];
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 // Interface for Department
 export interface Department {
   id: string;
   name: string;
-  parentDepartment?: string; // For hierarchical structure
+  parentDepartment?: string;
 }
 
 // Interface for Access Policy
@@ -87,21 +89,20 @@ export interface AccessRequest {
   status: "PENDING" | "APPROVED" | "DENIED";
   reviewedBy?: string;
   reviewedAt?: Date;
-  expiresAt: Date; // Expiration date for the access
-  lastModified: Date; // Track when the request was last modified
+  expiresAt: Date;
+  lastModified: Date;
 }
 
-// New LibraryHighlight interface
 export interface LibraryHighlight {
   id: string;
   kpiId: string;
-  kpi?: KPI; // Optional because we might not always need the full KPI data
+  kpi: KPI;
   type: LibraryHighlightType;
   order: number;
-  startDate: Date;
-  endDate: Date;
-  createdAt: Date;
-  updatedAt: Date;
+  startDate?: Date;
+  endDate?: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface Layout {

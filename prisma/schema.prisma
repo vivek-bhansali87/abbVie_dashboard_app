@@ -28,14 +28,14 @@ model KPI {
   id                    String            @id @default(uuid())
   name                  String
   description           String
-  accessLevel           String            // Replaced enum with String
-  authorizedRoles       String            // Store as JSON string
-  authorizedDepartments String            // Store as JSON string
-  metricIds             String            // Store as JSON string
-  visualizations        String            // Store as JSON string
-  businessQuestions     String            // Store as JSON string
+  accessLevel           String            
+  authorizedRoles       String            
+  authorizedDepartments String            
+  metricIds             String            
+  visualizations        String            
+  businessQuestions     String            
   calculations          String
-  affiliateApplicability String           // Store as JSON string
+  affiliateApplicability String           
   highlights            LibraryHighlight[]
   favorites             Favorite[]
   accessRequests        AccessRequest[]
@@ -57,7 +57,7 @@ model Department {
 model AccessPolicy {
   id        String   @id @default(uuid())
   name      String
-  rules     String   // Store as JSON string
+  rules     String   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -70,7 +70,7 @@ model AccessRequest {
   kpi         KPI      @relation(fields: [kpiId], references: [id])
   requestedAt DateTime @default(now())
   reason      String
-  status      String   // Replaced enum with String
+  status      String   
   reviewedBy  String?
   reviewedAt  DateTime?
   expiresAt   DateTime
@@ -81,14 +81,12 @@ model LibraryHighlight {
   id        String   @id @default(uuid())
   kpiId     String
   kpi       KPI      @relation(fields: [kpiId], references: [id])
-  type      String   // Replaced enum with String
+  type      String  
   order     Int
   startDate DateTime
   endDate   DateTime
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  @@unique([kpiId, type])
 }
 
 model Favorite {
@@ -107,7 +105,7 @@ model Layout {
   name      String
   userId    String
   user      User     @relation(fields: [userId], references: [id])
-  kpiIds    String // array of KPI Id's stored as string.
+  kpiIds    String 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

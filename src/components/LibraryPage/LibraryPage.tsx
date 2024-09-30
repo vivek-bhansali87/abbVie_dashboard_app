@@ -1,57 +1,87 @@
 "use client";
 
-import { useState } from "react";
-import { useKPIs } from "../../app/api/kpiApi";
+import { useState, useCallback } from "react";
+import { Box, Tabs, Tab, Typography } from "@mui/material";
+import debounce from "lodash/debounce";
+import KPICard from "./KPICards";
+
+import { useKPIs } from "@/app/api/kpiApi";
 import SearchBar from "./SearchBar";
-import KPIList from "./KPIList";
-import AssetModal from "../AssetModal/AssetModal";
-import { KPI } from "../../../types";
-import { useAppDispatch, useAppSelector } from "../../../lib/redux/hooks";
-import { addFavoriteKPI, removeFavoriteKPI } from "../../../lib/redux/kpiSlice";
+import { KPI } from "../../types";
 
-export default function LibraryPage() {
+interface LibraryPageProps {
+  featuredKPIs: KPI[];
+  trendingKPIs: KPI[];
+}
+
+export default function LibraryPage({
+  featuredKPIs,
+  trendingKPIs,
+}: LibraryPageProps) {
   const [search, setSearch] = useState("");
-  const [selectedKPI, setSelectedKPI] = useState<KPI | null>(null);
-  const { data: kpis, isLoading, error } = useKPIs(search);
-  const dispatch = useAppDispatch();
-  const favoriteKPIs = useAppSelector((store) => store.kpi.favoriteKPIs);
+  const [tabValue, setTabValue] = useState(0);
+  const { data: searchResults, isLoading, error } = useKPIs(search);
 
-  const handleKPISelect = (kpi: KPI) => {
-    setSelectedKPI(kpi);
-  };
-  const handleToggleFavorite = (kpiId: string) => {
-    if (favoriteKPIs.includes(kpiId)) {
-      dispatch(removeFavoriteKPI(kpiId));
-    } else {
-      dispatch(addFavoriteKPI(kpiId));
-    }
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setTabValue(newValue);
   };
 
-  const filteredKPIs =
-    kpis?.filter(
-      (kpi) =>
-        kpi.name.toLowerCase().includes(search.toLowerCase()) ||
-        kpi.description.toLowerCase().includes(search.toLowerCase())
-    ) || [];
+  const debouncedSearch = useCallback(
+    debounce((value: string) => setSearch(value), 300),
+    []
+  );
+
+  const renderKPICards = (kpis: KPI[]) => {
+    return (
+      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
+        {kpis.map((kpi) => (
+          <KPICard key={kpi.id} kpi={kpi} />
+        ))}
+      </Box>
+    );
+  };
 
   return (
-    <div>
-      <SearchBar value={search} onChange={setSearch} />
-      {isLoading ? (
-        <div>Loading...</div>
-      ) : error ? (
-        <div>Error: {error.message}</div>
-      ) : (
-        <KPIList
-          kpis={filteredKPIs || []}
-          onKPISelect={handleKPISelect}
-          favoriteKPIs={favoriteKPIs}
-          onToggleFavorite={handleToggleFavorite}
-        />
+    <Box sx={{ p: 3 }}>
+      <SearchBar onChange={debouncedSearch} />
+      <Tabs value={tabValue} onChange={handleTabChange} sx={{ mb: 2 }}>
+        <Tab label="Featured" />
+        <Tab label="KPI" />
+        <Tab label="Layout" />
+        <Tab label="StoryBoards" />
+      </Tabs>
+
+      {search && search.length && (
+        <Box sx={{ mt: 4 }}>
+          <Typography variant="h5">Search Result</Typography>
+          {isLoading ? (
+            <Typography>Loading...</Typography>
+          ) : error ? (
+            <Typography>Error: {error.message}</Typography>
+          ) : (
+            <>{renderKPICards(searchResults || [])}</>
+          )}
+        </Box>
       )}
-      {/* {selectedKPI && (
-        <AssetModal kpi={selectedKPI} onClose={() => setSelectedKPI(null)} />
-      )} */}
-    </div>
+      {tabValue === 0 && (
+        <>
+          <Typography variant="h5" gutterBottom>
+            Featured KPIs
+          </Typography>
+          {renderKPICards(featuredKPIs)}
+          <Typography variant="h5" gutterBottom sx={{ mt: 4 }}>
+            Trending KPIs
+          </Typography>
+          {renderKPICards(trendingKPIs)}
+        </>
+      )}
+      {tabValue === 1 && <Typography>KPI tab content (placeholder)</Typography>}
+      {tabValue === 2 && (
+        <Typography>Layout tab content (placeholder)</Typography>
+      )}
+      {tabValue === 3 && (
+        <Typography>Storyboard tab content (placeholder)</Typography>
+      )}
+    </Box>
   );
 }

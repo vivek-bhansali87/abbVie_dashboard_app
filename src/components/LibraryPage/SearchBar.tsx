@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { InputBase, Chip, Box, Typography, IconButton } from "@mui/material";
+import {
+  TextField,
+  Chip,
+  Box,
+  Typography,
+  InputAdornment,
+} from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 
 interface SearchBarProps {
-  value: string;
   onChange: (value: string) => void;
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ value, onChange }) => {
+const SearchBar: React.FC<SearchBarProps> = ({ onChange }) => {
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
 
   useEffect(() => {
@@ -30,31 +35,20 @@ const SearchBar: React.FC<SearchBarProps> = ({ value, onChange }) => {
   };
 
   return (
-    <Box>
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          border: "1px solid #ccc",
-          borderRadius: "4px",
-          padding: "2px",
+    <>
+      <TextField
+        fullWidth
+        variant="outlined"
+        placeholder="Search KPIs..."
+        onChange={(e) => onChange(e.target.value)}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchIcon />
+            </InputAdornment>
+          ),
         }}
-      >
-        <IconButton sx={{ padding: "10px" }} aria-label="search">
-          <SearchIcon />
-        </IconButton>
-        <InputBase
-          sx={{ ml: 1, flex: 1 }}
-          placeholder="Search KPIs..."
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              handleSearch(value);
-            }
-          }}
-        />
-      </Box>
+      />
       {recentSearches.length > 0 && (
         <Box mt={2}>
           <Typography variant="subtitle2" gutterBottom>
@@ -70,7 +64,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ value, onChange }) => {
           ))}
         </Box>
       )}
-    </Box>
+    </>
   );
 };
 

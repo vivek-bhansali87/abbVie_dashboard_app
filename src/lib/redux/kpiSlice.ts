@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { KPI } from "../../types";
+import { KPI } from "../../src/types";
 
 interface KPIState {
   kpis: KPI[];
