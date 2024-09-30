@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useKPIs } from "@/lib/api/kpiApi";
+import { useKPIs } from "../../api/kpiApi";
 import SearchBar from "./SearchBar";
 import KPIList from "./KPIList";
 import AssetModal from "../AssetModal/AssetModal";

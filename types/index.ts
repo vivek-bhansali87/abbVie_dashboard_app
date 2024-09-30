@@ -1,19 +1,19 @@
 // Enum for user roles
-enum UserRole {
+export enum UserRole {
   VIEWER = "VIEWER",
   EDITOR = "EDITOR",
   ADMIN = "ADMIN",
 }
 
 // Enum for KPI access levels
-enum KPIAccessLevel {
+export enum KPIAccessLevel {
   PUBLIC = "PUBLIC",
   RESTRICTED = "RESTRICTED",
   CONFIDENTIAL = "CONFIDENTIAL",
 }
 
 // New enum for LibraryHighlightType
-enum LibraryHighlightType {
+export enum LibraryHighlightType {
   FEATURED = "FEATURED",
   TRENDING = "TRENDING",
 }
@@ -100,6 +100,15 @@ export interface LibraryHighlight {
   order: number;
   startDate: Date;
   endDate: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface Layout {
+  id: string;
+  name: string;
+  userId: string;
+  kpiIds: string[];
   createdAt: Date;
   updatedAt: Date;
 }

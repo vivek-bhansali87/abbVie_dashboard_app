@@ -19,7 +19,7 @@ model User {
   department     Department      @relation(fields: [departmentId], references: [id])
   accessRequests AccessRequest[]
   favorites      Favorite[]
-  layouts        Layout[]
+  layout         Layout[]
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
 }
@@ -107,7 +107,7 @@ model Layout {
   name      String
   userId    String
   user      User     @relation(fields: [userId], references: [id])
-  content   String   // Store as JSON string
+  kpiIds    String // array of KPI Id's stored as string.
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
