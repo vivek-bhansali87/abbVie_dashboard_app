@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import * as dbTypes from "../../types/dbTypes";
-import * as types from "../../types";
+import * as dbTypes from "../../../types/dbTypes";
+import * as types from "../../../types";
 
 function parseUserRole(role: string): types.UserRole {
   if (Object.values(types.UserRole).includes(role as types.UserRole)) {
@@ -23,7 +23,7 @@ async function fetchKPIs(
   featured: boolean = false
 ): Promise<types.KPI[]> {
   const response = await fetch(
-    `/api/kpis?search=${search}&featured=${featured}`
+    `/api/kpis?search=${encodeURIComponent(search)}&featured=${featured}`
   );
   if (!response.ok) {
     throw new Error("Network response was not ok");
