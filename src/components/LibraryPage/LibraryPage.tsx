@@ -1,13 +1,16 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
-import { useState, useCallback } from "react";
-import { Box, Tabs, Tab, Typography } from "@mui/material";
+import React, { useEffect, useState, useCallback } from "react";
+import { Box, Tabs, Tab, Typography, Button } from "@mui/material";
+import { useRouter } from "next/navigation";
 import debounce from "lodash/debounce";
-import KPICard from "./KPICards";
-
-import { useKPIs } from "@/app/api/kpiApi";
 import SearchBar from "./SearchBar";
-import { KPI } from "../../types";
+import KPIList from "./KPIList";
+import KPICard from "./KPICards";
+import { KPI } from "@/types";
+import { useKPIs } from "@/app/api//kpiApi";
+import { useFavorites } from "@/app/api/favoritesApi";
 
 interface LibraryPageProps {
   featuredKPIs: KPI[];
@@ -20,10 +23,31 @@ export default function LibraryPage({
 }: LibraryPageProps) {
   const [search, setSearch] = useState("");
   const [tabValue, setTabValue] = useState(0);
-  const { data: searchResults, isLoading, error } = useKPIs(search);
+  const { data: userKPIs, isLoading, error } = useKPIs();
+  const { data: favorites, toggleFavorite } = useFavorites();
+  const router = useRouter();
+  const [user, setUser] = useState<{
+    id: string;
+    name: string;
+    role: string;
+  } | null>(null);
+
+  useEffect(() => {
+    const userString = localStorage.getItem("currentUser");
+    if (!userString) {
+      router.push("/");
+    } else {
+      setUser(JSON.parse(userString));
+    }
+  }, [router]);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("currentUser");
+    router.push("/");
   };
 
   const debouncedSearch = useCallback(
@@ -41,8 +65,33 @@ export default function LibraryPage({
     );
   };
 
+  const renderKPIList = (kpis: KPI[]) => (
+    <KPIList
+      kpis={kpis}
+      onToggleFavorite={toggleFavorite}
+      favoriteKPIs={favorites?.map((fav) => fav.kpiId) || []}
+    />
+  );
+
+  if (!user) {
+    return <Typography>Loading...</Typography>;
+  }
+
   return (
     <Box sx={{ p: 3 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 2,
+        }}
+      >
+        <Typography variant="h4">Welcome, {user.name}</Typography>
+        <Button onClick={handleLogout} variant="outlined">
+          Logout
+        </Button>
+      </Box>
       <SearchBar onChange={debouncedSearch} />
       <Tabs value={tabValue} onChange={handleTabChange} sx={{ mb: 2 }}>
         <Tab label="Featured" />
@@ -51,18 +100,6 @@ export default function LibraryPage({
         <Tab label="StoryBoards" />
       </Tabs>
 
-      {search && search.length && (
-        <Box sx={{ mt: 4 }}>
-          <Typography variant="h5">Search Result</Typography>
-          {isLoading ? (
-            <Typography>Loading...</Typography>
-          ) : error ? (
-            <Typography>Error: {error.message}</Typography>
-          ) : (
-            <>{renderKPICards(searchResults || [])}</>
-          )}
-        </Box>
-      )}
       {tabValue === 0 && (
         <>
           <Typography variant="h5" gutterBottom>
@@ -75,7 +112,22 @@ export default function LibraryPage({
           {renderKPICards(trendingKPIs)}
         </>
       )}
-      {tabValue === 1 && <Typography>KPI tab content (placeholder)</Typography>}
+
+      {tabValue === 1 && (
+        <>
+          <Typography variant="h5" gutterBottom>
+            Your KPIs
+          </Typography>
+          {isLoading ? (
+            <Typography>Loading...</Typography>
+          ) : error ? (
+            <Typography color="error">Error: {error.message}</Typography>
+          ) : (
+            renderKPIList(userKPIs || [])
+          )}
+        </>
+      )}
+
       {tabValue === 2 && (
         <Typography>Layout tab content (placeholder)</Typography>
       )}

@@ -1,7 +1,18 @@
-import Link from "next/link";
+"use client";
 import { Button, Box, Typography } from "@mui/material";
+import { useRouter } from "next/navigation";
+const users = [
+  { id: "user1", name: "John Doe", role: "Viewer" },
+  { id: "user2", name: "Jane Smith", role: "Editor" },
+];
 
 export default function HomePage() {
+  const router = useRouter();
+
+  const handleUserSelect = (user: (typeof users)[0]) => {
+    localStorage.setItem("currentUser", JSON.stringify(user));
+    router.push("/library");
+  };
   return (
     <Box
       sx={{
@@ -12,14 +23,22 @@ export default function HomePage() {
         minHeight: "100vh",
       }}
     >
-      <Typography variant="h1" component="h1" gutterBottom>
-        Welcome to KPI Dashboard
+      <Typography variant="h4" gutterBottom>
+        Choose a User
       </Typography>
-      <Link href="/library" passHref legacyBehavior>
-        <Button variant="contained" color="primary" component="a">
-          Go to Library Page
-        </Button>
-      </Link>
+      <Box sx={{ display: "flex", gap: 2 }}>
+        {users.map((user) => (
+          <Button
+            key={user.id}
+            variant="contained"
+            color="primary"
+            component="a"
+            onClick={() => handleUserSelect(user)}
+          >
+            {user.name} ({user.role})
+          </Button>
+        ))}
+      </Box>
     </Box>
   );
 }

@@ -35,3 +35,27 @@ export interface LibraryHighlight {
   updatedAt: string | Date;
   kpi: KPI;
 }
+
+export interface User {
+  id: string;
+  username: string;
+  email: string;
+  role: string;
+  departmentId: string;
+  department?: string;
+  accessRequests: string;
+  favorites?: string;
+  layout?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface Favorite {
+  id: string;
+  name: string;
+  userId: string;
+  user?: User;
+  kpiIds: string;
+  createdAt: string;
+  updatedAt: string;
+}

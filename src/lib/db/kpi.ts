@@ -54,7 +54,6 @@ async function getHighlightedKPIs(type: LibraryHighlightType): Promise<KPI[]> {
 }
 
 export async function getFeaturedKPIs(): Promise<KPI[]> {
-  console.log("in here");
   return getHighlightedKPIs(LibraryHighlightType.FEATURED);
 }
 

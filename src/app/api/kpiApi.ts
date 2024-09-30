@@ -53,3 +53,33 @@ export const useKPIs = (search: string = "", featured: boolean = false) => {
     queryFn: () => fetchKPIs(search, featured),
   });
 };
+
+async function fetchUserKPIs(): Promise<types.KPI[]> {
+  const response = await fetch("api/kpis/user");
+  if (!response.ok) {
+    throw new Error("Failed to fetch User KPIs");
+  }
+  const data = await response.json();
+
+  return data.map(
+    (kpi: dbTypes.KPI): types.KPI => ({
+      ...kpi,
+      accessLevel: parseKPIAccessLevel(kpi.accessLevel),
+      authorizedRoles: JSON.parse(kpi.authorizedRoles).map(parseUserRole),
+      authorizedDepartments: JSON.parse(kpi.authorizedDepartments),
+      metricIds: JSON.parse(kpi.metricIds),
+      visualizations: JSON.parse(kpi.visualizations),
+      businessQuestions: JSON.parse(kpi.businessQuestions),
+      affiliateApplicability: JSON.parse(kpi.affiliateApplicability),
+      createdAt: new Date(kpi.createdAt),
+      updatedAt: new Date(kpi.updatedAt),
+    })
+  );
+}
+
+export const useUserKPIs = () => {
+  return useQuery<types.KPI[], Error>({
+    queryKey: ["userKPIs"],
+    queryFn: fetchUserKPIs,
+  });
+};
