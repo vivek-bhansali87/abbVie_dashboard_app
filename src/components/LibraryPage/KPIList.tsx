@@ -10,16 +10,11 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
-  IconButton,
-  Snackbar,
   SelectChangeEvent,
 } from "@mui/material";
 
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import LinkIcon from "@mui/icons-material/Link";
-
 import { KPI } from "@/types";
+import AssetModal from "../AssetModal";
 
 interface KPIListProps {
   kpis: KPI[];
@@ -29,13 +24,12 @@ interface KPIListProps {
 
 const KPIList: React.FC<KPIListProps> = ({
   kpis,
-  onToggleFavorite,
   favoriteKPIs,
+  onToggleFavorite,
 }) => {
   const [displayCount, setDisplayCount] = useState(10);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [selectedKPI, setSelectedKPI] = useState<KPI | null>(null);
 
   const handleShowMore = () => {
     setDisplayCount((prevCount) =>
@@ -43,21 +37,16 @@ const KPIList: React.FC<KPIListProps> = ({
     );
   };
 
-  const handleCopyLink = (kpiId: string) => {
-    const link = `https://localhost:3000/api/kpi/${kpiId}`;
-    navigator.clipboard
-      .writeText(link)
-      .then(() => {
-        setSnackbarMessage("Link copied to clipboard");
-        setSnackbarOpen(true);
-      })
-      .catch((error) => {
-        console.error("Error while copying link. erorr details: ", error);
-      });
-  };
-
   const handleItemsPerPageChange = (event: SelectChangeEvent<number>) => {
     setItemsPerPage(event.target.value as number);
+  };
+
+  const handleKPIClick = (kpi: KPI) => {
+    setSelectedKPI(kpi);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedKPI(null);
   };
 
   return (
@@ -66,7 +55,10 @@ const KPIList: React.FC<KPIListProps> = ({
         <Grid2 container spacing={2}>
           {kpis.slice(0, displayCount).map((kpi) => (
             <Grid2 key={kpi.id} size={{ xs: 12, sm: 6, md: 4 }}>
-              <Card>
+              <Card
+                onClick={() => handleKPIClick(kpi)}
+                sx={{ cursor: "pointer" }}
+              >
                 <CardContent>
                   <Box
                     display="flex"
@@ -76,18 +68,6 @@ const KPIList: React.FC<KPIListProps> = ({
                     <Typography variant="h6" component="div">
                       {kpi.name}
                     </Typography>
-                    <Box>
-                      <IconButton onClick={() => onToggleFavorite(kpi.id)}>
-                        {favoriteKPIs.includes(kpi.id) ? (
-                          <FavoriteIcon color="error" />
-                        ) : (
-                          <FavoriteBorderIcon />
-                        )}
-                      </IconButton>
-                      <IconButton onClick={() => handleCopyLink(kpi.id)}>
-                        <LinkIcon />
-                      </IconButton>
-                    </Box>
                   </Box>
                   <Typography variant="body2" color="text.secondary">
                     {kpi.description}
@@ -130,12 +110,15 @@ const KPIList: React.FC<KPIListProps> = ({
           </Select>
         </FormControl>
       </Box>
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={3000}
-        onClose={() => setSnackbarOpen(false)}
-        message={snackbarMessage}
-      />
+      {selectedKPI && (
+        <AssetModal
+          kpi={selectedKPI}
+          onClose={handleCloseModal}
+          onFavorite={() => onToggleFavorite(selectedKPI.id)}
+          open={!!selectedKPI}
+          isFavorite={favoriteKPIs.includes(selectedKPI.id)}
+        />
+      )}
     </Box>
   );
 };

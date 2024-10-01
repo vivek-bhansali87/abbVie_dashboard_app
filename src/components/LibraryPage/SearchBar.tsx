@@ -38,7 +38,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onChange }) => {
     <>
       <TextField
         fullWidth
-        variant="outlined"
+        variant="standard"
         placeholder="Search KPIs..."
         onChange={(e) => onChange(e.target.value)}
         InputProps={{

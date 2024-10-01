@@ -7,7 +7,6 @@ import { Roboto } from "next/font/google";
 import theme from "./theme";
 import StoreProvider from "./StoreProvider";
 import QueryProvider from "./QueryProvider";
-// import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 const roboto = Roboto({
   weight: ["300", "400", "500", "700"],
@@ -33,10 +32,7 @@ export default function RootLayout({
           <AppRouterCacheProvider>
             <ThemeProvider theme={theme}>
               <CssBaseline>
-                <QueryProvider>
-                  {children}
-                  {/* <ReactQueryDevtools /> */}
-                </QueryProvider>
+                <QueryProvider>{children}</QueryProvider>
               </CssBaseline>
             </ThemeProvider>
           </AppRouterCacheProvider>

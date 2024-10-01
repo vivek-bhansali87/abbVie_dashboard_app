@@ -2,14 +2,24 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
-import { Box, Tabs, Tab, Typography, Button } from "@mui/material";
+import {
+  Box,
+  Tabs,
+  Tab,
+  Typography,
+  Button,
+  Container,
+  Grid,
+  Paper,
+} from "@mui/material";
 import { useRouter } from "next/navigation";
 import debounce from "lodash/debounce";
 import SearchBar from "./SearchBar";
 import KPIList from "./KPIList";
 import KPICard from "./KPICards";
+import RequestModal from "../RequestModal";
 import { KPI } from "@/types";
-import { useKPIs } from "@/app/api//kpiApi";
+import { useKPIs, useUserKPIs } from "@/app/api/kpiApi";
 import { useFavorites } from "@/app/api/favoritesApi";
 
 interface LibraryPageProps {
@@ -23,14 +33,15 @@ export default function LibraryPage({
 }: LibraryPageProps) {
   const [search, setSearch] = useState("");
   const [tabValue, setTabValue] = useState(0);
-  const { data: userKPIs, isLoading, error } = useKPIs();
+  const { data: userKPIs, isLoading, error } = useUserKPIs();
   const { data: favorites, toggleFavorite } = useFavorites();
-  const router = useRouter();
+  const [requestModalOpen, setRequestModalOpen] = useState(false);
   const [user, setUser] = useState<{
     id: string;
     name: string;
     role: string;
   } | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const userString = localStorage.getItem("currentUser");
@@ -77,63 +88,120 @@ export default function LibraryPage({
     return <Typography>Loading...</Typography>;
   }
 
+  const handleRequestSubmit = (selectedKPIs: string[]) => {
+    setRequestModalOpen(false);
+  };
+
   return (
-    <Box sx={{ p: 3 }}>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          mb: 2,
-        }}
-      >
-        <Typography variant="h4">Welcome, {user.name}</Typography>
-        <Button onClick={handleLogout} variant="outlined">
-          Logout
-        </Button>
-      </Box>
-      <SearchBar onChange={debouncedSearch} />
-      <Tabs value={tabValue} onChange={handleTabChange} sx={{ mb: 2 }}>
-        <Tab label="Featured" />
-        <Tab label="KPI" />
-        <Tab label="Layout" />
-        <Tab label="StoryBoards" />
-      </Tabs>
-
-      {tabValue === 0 && (
-        <>
-          <Typography variant="h5" gutterBottom>
-            Featured KPIs
+    <Box sx={{ bgcolor: "rgba(0,0,0,0.04)", minHeight: "100vh", py: 4 }}>
+      <Container maxWidth="md">
+        <Box display={"flex"} justifyContent={"end"}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => setRequestModalOpen(true)}
+          >
+            Request
+          </Button>
+          <Button
+            onClick={handleLogout}
+            variant="contained"
+            color="primary"
+            sx={{ ml: 3 }}
+          >
+            Logout
+          </Button>
+        </Box>
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          m={2}
+          flexDirection={"column"}
+        >
+          <Typography variant="h2" fontWeight="bold">
+            Library
           </Typography>
-          {renderKPICards(featuredKPIs)}
-          <Typography variant="h5" gutterBottom sx={{ mt: 4 }}>
-            Trending KPIs
+          <Typography variant="h5" color="text.secondary" mb={3}>
+            Browse for assets needed to report and present analysis.
           </Typography>
-          {renderKPICards(trendingKPIs)}
-        </>
-      )}
+        </Box>
 
-      {tabValue === 1 && (
-        <>
-          <Typography variant="h5" gutterBottom>
-            Your KPIs
-          </Typography>
-          {isLoading ? (
-            <Typography>Loading...</Typography>
-          ) : error ? (
-            <Typography color="error">Error: {error.message}</Typography>
-          ) : (
-            renderKPIList(userKPIs || [])
-          )}
-        </>
-      )}
+        <Paper
+          component="form"
+          sx={{ p: "2px 4px", display: "flex", alignItems: "center" }}
+        >
+          <SearchBar onChange={debouncedSearch} />
+        </Paper>
 
-      {tabValue === 2 && (
-        <Typography>Layout tab content (placeholder)</Typography>
-      )}
-      {tabValue === 3 && (
-        <Typography>Storyboard tab content (placeholder)</Typography>
-      )}
+        <Tabs
+          value={tabValue}
+          onChange={handleTabChange}
+          centered
+          sx={{
+            mt: 5,
+            mb: 2,
+            bgcolor: "rgba(0,0,0,0.04)",
+            borderRadius: "5px",
+          }}
+        >
+          <Tab label="Featured" sx={{ width: "25%" }} />
+          <Tab label="KPI" sx={{ width: "25%" }} />
+          <Tab label="Layouts" sx={{ width: "25%" }} />
+          <Tab label="Storyboards" sx={{ width: "25%" }} />
+        </Tabs>
+
+        {tabValue === 0 && (
+          <Box sx={{ pt: 2 }}>
+            <Typography variant="h5" fontWeight="bold" gutterBottom>
+              Featured
+            </Typography>
+            <Typography variant="body2" color="text.secondary" mb={2}>
+              Curated top picks from this week
+            </Typography>
+            {renderKPICards(featuredKPIs)}
+
+            <Typography variant="h5" fontWeight="bold" gutterBottom mt={4}>
+              Trending
+            </Typography>
+            <Typography variant="body2" color="text.secondary" mb={2}>
+              Most popular by community
+            </Typography>
+            {renderKPICards(trendingKPIs)}
+          </Box>
+        )}
+
+        {tabValue === 1 && (
+          <Box sx={{ pt: 2 }}>
+            <Typography variant="h5" fontWeight="bold" gutterBottom>
+              All KPIs
+            </Typography>
+            {isLoading ? (
+              <Typography>Loading...</Typography>
+            ) : error ? (
+              <Typography color="error">Error: {error.message}</Typography>
+            ) : (
+              renderKPIList(userKPIs || [])
+            )}
+          </Box>
+        )}
+
+        {tabValue === 2 && (
+          <Box sx={{ pt: 2 }}>
+            <Typography>Layouts tab content (placeholder)</Typography>
+          </Box>
+        )}
+        {tabValue === 3 && (
+          <Box sx={{ pt: 2 }}>
+            <Typography>Storyboards tab content (placeholder)</Typography>
+          </Box>
+        )}
+        <RequestModal
+          open={requestModalOpen}
+          onClose={() => setRequestModalOpen(false)}
+          onSubmit={handleRequestSubmit}
+        />
+      </Container>
     </Box>
   );
 }
