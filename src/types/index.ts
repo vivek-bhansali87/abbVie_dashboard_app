@@ -1,24 +1,20 @@
-// Enum for user roles
 export enum UserRole {
   VIEWER = "VIEWER",
   EDITOR = "EDITOR",
   ADMIN = "ADMIN",
 }
 
-// Enum for KPI access levels
 export enum KPIAccessLevel {
   PUBLIC = "PUBLIC",
   RESTRICTED = "RESTRICTED",
   CONFIDENTIAL = "CONFIDENTIAL",
 }
 
-// New enum for LibraryHighlightType
 export enum LibraryHighlightType {
   FEATURED = "FEATURED",
   TRENDING = "TRENDING",
 }
 
-// New Favorite interface
 export interface Favorite {
   id: string;
   userId: string;
@@ -28,7 +24,6 @@ export interface Favorite {
   createdAt: Date;
 }
 
-// Interface for User
 export interface User {
   id: string;
   username: string;
@@ -41,7 +36,6 @@ export interface User {
   updatedAt: Date;
 }
 
-// Interface for KPI
 export interface KPI {
   id: string;
   name: string;
@@ -61,14 +55,12 @@ export interface KPI {
   updatedAt: Date;
 }
 
-// Interface for Department
 export interface Department {
   id: string;
   name: string;
   parentDepartment?: string;
 }
 
-// Interface for Access Policy
 export interface AccessPolicy {
   id: string;
   name: string;
@@ -79,7 +71,6 @@ export interface AccessPolicy {
   };
 }
 
-// Interface for Access Request
 export interface AccessRequest {
   id: string;
   userId: string;
