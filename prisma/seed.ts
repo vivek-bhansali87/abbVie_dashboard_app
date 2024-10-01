@@ -134,13 +134,14 @@ async function main() {
     },
   });
 
-  // await prisma.layout.create({
-  //   data: {
-  //     name: "Default Layout",
-  //     user: { connect: { id: user1.id } },
-  //     kpiIds: JSON.stringify([kpi1.id, kpi2.id]),
-  //   },
-  // });
+  // Create Layout
+  await prisma.layout.create({
+    data: {
+      name: "Default Layout",
+      userId: user1.id,
+      kpiIds: JSON.stringify([kpi1.id, kpi2.id]),
+    },
+  });
 
   console.log("Seed data inserted successfully");
 }
