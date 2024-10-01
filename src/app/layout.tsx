@@ -5,8 +5,8 @@ import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { Roboto } from "next/font/google";
 import theme from "./theme";
-import StoreProvider from "./StoreProvider";
-import QueryProvider from "./QueryProvider";
+import StoreProvider from "./providers/StoreProvider";
+import QueryProvider from "./providers/QueryProvider";
 
 const roboto = Roboto({
   weight: ["300", "400", "500", "700"],

@@ -88,8 +88,13 @@ export default function LibraryPage({
     return <Typography>Loading...</Typography>;
   }
 
-  const handleRequestSubmit = (selectedKPIs: string[]) => {
+  const handleRequestSubmit = (
+    selectedKPIs: string[],
+    reasonText: string | null
+  ) => {
     setRequestModalOpen(false);
+
+    // Implemented Request API.
   };
 
   return (

@@ -15,13 +15,14 @@ import {
   SelectChangeEvent,
   Typography,
   Snackbar,
+  TextField,
 } from "@mui/material";
 import { useKPIs } from "@/app/api/kpiApi";
 
 interface RequestModalProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (selectedKPIs: string[]) => void;
+  onSubmit: (selectedKPIs: string[], reasonText: string | null) => void;
 }
 
 const RequestModal: React.FC<RequestModalProps> = ({
@@ -30,6 +31,7 @@ const RequestModal: React.FC<RequestModalProps> = ({
   onSubmit,
 }) => {
   const [selectedKPIs, setSelectedKPIs] = useState<string[]>([]);
+  const [reasontext, setReasonText] = useState<string | null>("");
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const { data: kpis, isLoading, error } = useKPIs();
 
@@ -40,8 +42,12 @@ const RequestModal: React.FC<RequestModalProps> = ({
     setSelectedKPIs(typeof value === "string" ? value.split(",") : value);
   };
 
+  const handleTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setReasonText(event.target.value);
+  };
+
   const handleSubmit = () => {
-    onSubmit(selectedKPIs);
+    onSubmit(selectedKPIs, reasontext);
     setSnackbarOpen(true);
     setSelectedKPIs([]);
   };
@@ -76,6 +82,17 @@ const RequestModal: React.FC<RequestModalProps> = ({
                   </MenuItem>
                 ))}
             </Select>
+          </FormControl>
+          <FormControl fullWidth sx={{ mt: 2 }}>
+            <TextField
+              id="standard-multiline-static"
+              label="Reason for access"
+              multiline
+              rows={2}
+              variant="outlined"
+              onChange={handleTextChange}
+              value={reasontext}
+            />
           </FormControl>
         </DialogContent>
         <DialogActions>

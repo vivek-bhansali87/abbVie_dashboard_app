@@ -2,6 +2,17 @@ import { useQuery } from "@tanstack/react-query";
 import * as dbTypes from "../../types/dbTypes";
 import * as types from "../../types";
 
+const getCurrentUserId = (): string | null => {
+  if (typeof window !== "undefined") {
+    const userString = localStorage.getItem("currentUser");
+    if (userString) {
+      const user = JSON.parse(userString);
+      return user.id;
+    }
+  }
+  return null;
+};
+
 function parseUserRole(role: string): types.UserRole {
   if (Object.values(types.UserRole).includes(role as types.UserRole)) {
     return role as types.UserRole;
@@ -55,26 +66,17 @@ export const useKPIs = (search: string = "", featured: boolean = false) => {
 };
 
 async function fetchUserKPIs(): Promise<types.KPI[]> {
-  const response = await fetch("api/kpis/user");
+  const userId = getCurrentUserId();
+
+  if (!userId) {
+    throw new Error("No user selected");
+  }
+
+  const response = await fetch(`/api/kpis/${userId}`);
   if (!response.ok) {
     throw new Error("Failed to fetch User KPIs");
   }
-  const data = await response.json();
-
-  return data.map(
-    (kpi: dbTypes.KPI): types.KPI => ({
-      ...kpi,
-      accessLevel: parseKPIAccessLevel(kpi.accessLevel),
-      authorizedRoles: JSON.parse(kpi.authorizedRoles).map(parseUserRole),
-      authorizedDepartments: JSON.parse(kpi.authorizedDepartments),
-      metricIds: JSON.parse(kpi.metricIds),
-      visualizations: JSON.parse(kpi.visualizations),
-      businessQuestions: JSON.parse(kpi.businessQuestions),
-      affiliateApplicability: JSON.parse(kpi.affiliateApplicability),
-      createdAt: new Date(kpi.createdAt),
-      updatedAt: new Date(kpi.updatedAt),
-    })
-  );
+  return response.json();
 }
 
 export const useUserKPIs = () => {
