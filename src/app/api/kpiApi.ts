@@ -29,7 +29,7 @@ function parseKPIAccessLevel(level: string): types.KPIAccessLevel {
   throw new Error(`Invalid KPI access level: ${level}`);
 }
 
-async function fetchKPIs(
+export async function fetchKPIs(
   search: string = "",
   featured: boolean = false
 ): Promise<types.KPI[]> {

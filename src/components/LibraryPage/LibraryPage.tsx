@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Tabs,
@@ -9,17 +9,15 @@ import {
   Typography,
   Button,
   Container,
-  Grid,
   Paper,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
-import debounce from "lodash/debounce";
 import SearchBar from "./SearchBar";
 import KPIList from "./KPIList";
 import KPICard from "./KPICards";
 import RequestModal from "../RequestModal";
 import { KPI } from "@/types";
-import { useKPIs, useUserKPIs } from "@/app/api/kpiApi";
+import { useUserKPIs } from "@/app/api/kpiApi";
 import { useFavorites } from "@/app/api/favoritesApi";
 
 interface LibraryPageProps {
@@ -31,7 +29,6 @@ export default function LibraryPage({
   featuredKPIs,
   trendingKPIs,
 }: LibraryPageProps) {
-  const [search, setSearch] = useState("");
   const [tabValue, setTabValue] = useState(0);
   const { data: userKPIs, isLoading, error } = useUserKPIs();
   const { data: favorites, toggleFavorite } = useFavorites();
@@ -60,11 +57,6 @@ export default function LibraryPage({
     localStorage.removeItem("currentUser");
     router.push("/");
   };
-
-  const debouncedSearch = useCallback(
-    debounce((value: string) => setSearch(value), 300),
-    []
-  );
 
   const renderKPICards = (kpis: KPI[]) => {
     return (
@@ -136,7 +128,7 @@ export default function LibraryPage({
           component="form"
           sx={{ p: "2px 4px", display: "flex", alignItems: "center" }}
         >
-          <SearchBar onChange={debouncedSearch} />
+          <SearchBar />
         </Paper>
 
         <Tabs
